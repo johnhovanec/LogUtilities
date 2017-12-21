@@ -1,0 +1,105 @@
+#!/bin/sh
+# Script to check smtp, pop3, and imap for email related servers, namely using telnet.
+# John Hovanec 7-24-15
+
+ES='10.1.10.25' #Emailserver, or whatever target IP you're trying to hit
+
+# colors to use 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+#Connection function to test SMTP
+smtpTest()
+{
+	arg1=$1
+	#arg2=$2 #No need here for 2 args
+	#command on $arg1 #trace to test 
+	#echo "smtpTest(): total args passed to me: \"$@\""
+	#echo "smtpTest(): total args passed to me: \"$*\""
+
+	#Connect to Server
+	echo
+	echo '* * * * *  Connecting to '$1'....  * * * * *'
+	echo
+	{
+		sleep 1
+		echo helo test
+		sleep 1
+		echo ehlo test
+		sleep 1
+		echo quit
+		sleep 1
+		echo
+	} | telnet $1 25
+	timer
+}
+
+popTest()
+{
+	echo
+	echo '* * * * *  POP3 Test Connecting to '$1'....  * * * * *'
+	echo
+	{
+		sleep 1
+		echo quit
+		sleep 1
+		echo
+	} | telnet $1 110
+	timer
+} 
+
+imapTest()
+{
+	echo
+	echo '* * * * *  IMAP Test Connecting to '$1'....  * * * * *'
+	echo
+	{
+		sleep 1
+		echo aa login testuser daedalus
+		sleep 1
+		echo aa logout
+		sleep 1
+		echo
+	} | telnet $1 143
+	timer
+}
+	
+#Timer function called between server connections
+timer()
+{
+	for var in 0 1   
+	do 
+		sleep 1
+		echo '*'
+	done
+}
+
+# Test function to get return value
+testFn()
+{
+arg=$1
+arg2=$2
+echo "1: $arg"
+echo "2: $2"
+	echo "smtpTest(): total args passed to me: \"$@\""
+	if ($1)
+		then
+			printf "$1" "${GREEN} OK${NC} on $ES\n"
+	fi
+}
+
+#Call functions
+# smtpTest $SC # Off since telnet is blocked to SurfControl 
+smtpTest $ES
+
+#if $?
+#	then
+#			printf "${GREEN} SMTP OK${NC} on $ES\n"
+#else
+#	echo "Err"
+#fi
+
+popTest $ES
+imapTest $ES
+#testFn $smtpTest $smtp 
