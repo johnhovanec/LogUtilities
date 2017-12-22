@@ -1,0 +1,6 @@
+C:\Users\jhovanec\Documents\Visual Studio 2015\Projects\IISLogParser\IISLogParser\bin\Debug\IISLogParser.exe.config
+C:\Users\jhovanec\Documents\Visual Studio 2015\Projects\IISLogParser\IISLogParser\bin\Debug\IISLogParser.exe
+C:\Users\jhovanec\Documents\Visual Studio 2015\Projects\IISLogParser\IISLogParser\bin\Debug\IISLogParser.pdb
+C:\Users\jhovanec\Documents\Visual Studio 2015\Projects\IISLogParser\IISLogParser\obj\Debug\IISLogParser.csprojResolveAssemblyReference.cache
+C:\Users\jhovanec\Documents\Visual Studio 2015\Projects\IISLogParser\IISLogParser\obj\Debug\IISLogParser.exe
+C:\Users\jhovanec\Documents\Visual Studio 2015\Projects\IISLogParser\IISLogParser\obj\Debug\IISLogParser.pdb
