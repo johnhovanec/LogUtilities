@@ -9,7 +9,7 @@
 #### C# console application to parse an IIS log file based on a target IP address. Returns the date, method and uri stem to the console, or optionally to a text file.
 
 ### Mac Logon Script
-#### If you ever need to have Macs in an Active Directory domain mount network shares, this will do it. Also includes a plist file to dictate when the script is run.
+#### If you ever need to have Macs in an Active Directory domain mount network shares, this will do it. Also includes a plist file to setup when the script is run.
 
 ### Bash SMTP Telnet tests
 #### A basic Telnet script to test SMTP, POP3, and IMAP for a given IP address with some fancy color coding.
