@@ -18,10 +18,6 @@ namespace IISLogParser
             path = Console.ReadLine();   //@"h:\u_ex171219.log"; 
             Console.WriteLine("Path entered is: " + path);
 
-            
-            
-            
-
             if (File.Exists(path))
             {
                 string targetIP;
