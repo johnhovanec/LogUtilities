@@ -93,7 +93,6 @@ namespace IISLogParser
 
                     Console.WriteLine("\n\rFound " + count + " instances of " + targetIP + "\n\r");
                     count = 0;
-
                 }
             }
 
