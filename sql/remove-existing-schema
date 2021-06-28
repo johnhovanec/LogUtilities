@@ -1,0 +1,109 @@
+```sql
+/* 
+   This script is designed to be run one section at a time, from top to bottom, 
+   with each section being run with the name of the schema(s) to be removed.
+   This is done to remove all objects and constraints before we can drop the 
+   unwanted schemas.
+*/
+
+
+/******************************************************/
+/* 1. Drop all non-system stored procs for a given schema */
+USE MDHEPHT
+GO 
+DECLARE @name VARCHAR(128)
+DECLARE @SQL VARCHAR(254)
+DECLARE @schema VARCHAR(128) = 'DHMHS' --'SDEEPHTAdmin'-- set schema name to drop
+
+SELECT @name = (SELECT TOP 1 so.name FROM sys.objects so INNER JOIN sys.schemas s ON so.schema_id = s.schema_id WHERE [type] = 'P' AND s.name = @schema order by so.name)
+
+WHILE @name is not null
+BEGIN
+    SELECT @SQL = 'DROP PROCEDURE [' + @schema + '].[' + RTRIM(@name) +']'
+    EXEC (@SQL)
+    PRINT 'Dropped Procedure: ' + @schema + ': ' + @name
+    SELECT @name = (SELECT TOP 1 so.name FROM sys.objects so INNER JOIN sys.schemas s ON so.schema_id = s.schema_id WHERE [type] = 'P' AND s.name = @schema AND so.name > @name ORDER BY so.name)
+END
+GO
+/******************************************************/
+
+
+
+/******************************************************/
+/* 2. Drop all views for a given schema */
+USE MDHEPHT
+GO
+DECLARE @name VARCHAR(128)
+DECLARE @SQL VARCHAR(254)
+DECLARE @schema VARCHAR(128) = 'DHMHS'-- set schema name. The only schema to drop views for. 
+
+SELECT @name = (SELECT TOP 1 so.name FROM sys.objects so INNER JOIN sys.schemas s ON so.schema_id = s.schema_id WHERE [type] = 'V' AND s.name = @schema ORDER BY so.name)
+
+WHILE @name IS NOT NULL
+BEGIN
+    SELECT @SQL = 'DROP VIEW [' + @schema + '].[' + RTRIM(@name) +']'
+    EXEC (@SQL)
+    PRINT 'Dropped View: ' + @name
+    SELECT @name = (SELECT TOP 1 so.name FROM sys.objects so INNER JOIN sys.schemas s ON so.schema_id = s.schema_id WHERE [type] = 'V' AND s.name = @schema AND so.name > @name ORDER BY so.name)
+END
+GO
+/******************************************************/
+
+
+
+/******************************************************/
+/* 3. Drop Primary Key constraints for a given schema */
+USE MDHEPHT
+GO
+DECLARE @name VARCHAR(128)
+DECLARE @constraint VARCHAR(254)
+DECLARE @SQL VARCHAR(254)
+DECLARE @schema VARCHAR(128) = 'DHMHS' --'SDEEPHTAdmin' set schema name. BOTH SCHEMAS ARE IN USE.
+
+SELECT @name = (SELECT TOP 1 TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'PRIMARY KEY' AND CONSTRAINT_SCHEMA = @schema ORDER BY TABLE_NAME)
+
+WHILE @name IS NOT NULL
+BEGIN
+    SELECT @constraint = (SELECT TOP 1 CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'PRIMARY KEY' AND TABLE_NAME = @name AND TABLE_SCHEMA = @schema ORDER BY CONSTRAINT_NAME)
+    WHILE @constraint is not null
+    BEGIN
+        SELECT @SQL = 'ALTER TABLE [' + @schema + '].[' + RTRIM(@name) +'] DROP CONSTRAINT [' + RTRIM(@constraint)+']'
+        EXEC (@SQL)
+        PRINT 'Dropped PK Constraint: ' + @constraint + ' on ' + @name
+        SELECT @constraint = (SELECT TOP 1 CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'PRIMARY KEY' AND CONSTRAINT_NAME <> @constraint AND TABLE_NAME = @name AND TABLE_SCHEMA = @schema ORDER BY CONSTRAINT_NAME)
+    END
+SELECT @name = (SELECT TOP 1 TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_catalog=DB_NAME() AND CONSTRAINT_TYPE = 'PRIMARY KEY' AND CONSTRAINT_SCHEMA = @schema ORDER BY TABLE_NAME)
+END
+GO
+/******************************************************/
+
+
+
+/******************************************************/
+/* 4. Drop all tables for the given schema */
+USE MDHEPHT
+GO
+DECLARE @name VARCHAR(128)
+DECLARE @SQL VARCHAR(254)
+DECLARE @schema VARCHAR(128) = 'DHMHS' --'SDEEPHTAdmin' set schema name. BOTH SCHEMAS ARE IN USE.
+
+SELECT @name = (SELECT TOP 1 so.name FROM sys.objects so INNER JOIN sys.schemas s ON so.schema_id = s.schema_id WHERE [type] = 'U' AND s.name = @schema ORDER BY so.name)
+
+WHILE @name IS NOT NULL
+BEGIN
+    SELECT @SQL = 'DROP TABLE [' + @schema + '].[' + RTRIM(@name) +']'
+    EXEC (@SQL)
+    PRINT 'Dropped Table: ' + @name
+    SELECT @name = (SELECT TOP 1 so.name FROM sys.objects so INNER JOIN sys.schemas s ON so.schema_id = s.schema_id WHERE [type] = 'U' AND s.name = @schema AND so.name > @name ORDER BY so.name)
+END
+GO
+/******************************************************/
+
+
+/******************************************************/
+/* 5. Drop a given schema. Note: This should be run last after the above scripts! */
+USE MDHEPHT
+GO
+DROP SCHEMA DHMHS --SDEEPHTAdmin set schema name. BOTH SCHEMAS ARE IN USE. Note the schema name is NOT quoted.
+/******************************************************/
+```
