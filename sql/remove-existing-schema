@@ -1,4 +1,4 @@
-```sql
+``` sql
 /* 
    This script is designed to be run one section at a time, from top to bottom, 
    with each section being run with the name of the schema(s) to be removed.
